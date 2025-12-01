@@ -10,12 +10,6 @@ type Student struct {
 
 var Redovalnica = make(map[string]Student)
 
-func izpisRedovalnice(studenti map[string]Student){
-	fmt.Println("REDOVALNICA:")
-	for kljuc,s := range studenti {
-		fmt.Printf("%s - %s %s: %v\n", kljuc, s.ime, s.priimek, s.ocene)
-	}
-}
 
 func dodajOceno(redovalnica map[string]Student, vpisnaStevilka string, ocena int){
 	if ocena < 0 || ocena > 10{
