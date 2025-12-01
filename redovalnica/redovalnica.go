@@ -1,25 +1,36 @@
+//Package redovalnica vsebuje funkcije za delo z ocenami in izpis končnega stanja uspeha študentov
 package redovalnica
 
 import "fmt"
 
+//Student predstavlja enega posameznega študenta in njegove ocene
 type Student struct {
-    ime     string
-    priimek string
-    ocene   []int
+    Ime     string
+    Priimek string
+    Ocene   []int
 }
 
-var Redovalnica = make(map[string]Student)
+//Redovalnica hrani podatke o ocenah študentov
+var Redovalnica = make(map[string]Student) //NUJNO treba pisat z veliko!!
 
+//IzpisVsehOcen izpiše ocene vseh študentov
+func IzpisVsehOcen(){
+	fmt.Println("REDOVALNICA:")
+	for kljuc,s := range Redovalnica {
+		fmt.Printf("%s - %s %s: %v\n", kljuc, s.Ime, s.Priimek, s.Ocene)
+	}
+}
 
-func dodajOceno(redovalnica map[string]Student, vpisnaStevilka string, ocena int){
-	if ocena < 0 || ocena > 10{
+//DodajOceno je funkcija, ki študentu z vpisno številko <x> doda (celoštevilsko) oceno 
+func DodajOceno(vpisnaStevilka string, ocena int, minOcena int, maxOcena int){
+	if ocena < minOcena || ocena > maxOcena{
 		fmt.Println("Neveljavna ocena!")
 		return
 	}
 
-	if s, ok := redovalnica[vpisnaStevilka]; ok { //s je kopija structa, tega specificnega studenta
-		s.ocene = append(s.ocene, ocena) //dodamo oceno tej kopiji
-		redovalnica[vpisnaStevilka] = s //jo shranimo nazaj, nadomesti original
+	if s, ok := Redovalnica[vpisnaStevilka]; ok { //s je kopija structa, tega specificnega studenta
+		s.Ocene = append(s.Ocene, ocena) //dodamo oceno tej kopiji
+		Redovalnica[vpisnaStevilka] = s //jo shranimo nazaj, nadomesti original
 		fmt.Println("Ocena uspesno vpisana.")
 	} else {
 		fmt.Println("Student s tako vpisno stevilko ne obstaja!")
@@ -27,18 +38,21 @@ func dodajOceno(redovalnica map[string]Student, vpisnaStevilka string, ocena int
 	}
 }
 
-func povprecje(redovalnica map[string]Student, vpisnaStevilka string)float64{
-	if s, ok := redovalnica[vpisnaStevilka]; ok {
-		if len(s.ocene) == 0{
+//povprecje je skrita funkcija, računa povprečje ocen študenta z vpisno številko <x>
+func povprecje(vpisnaStevilka string)float64{
+	//da ostane skrita funkcija, se mora zaceti ime funkcije z malo zacetnico 
+	//ostale funkcije ki morajo biti vidne izven paketa pa imajo veliko zacetnico
+	if s, ok := Redovalnica[vpisnaStevilka]; ok {
+		if len(s.Ocene) == 0{
 			return 0
 		}
 
 		vsota := 0
-		for _, ocena := range s.ocene{
+		for _, ocena := range s.Ocene{
 			vsota +=ocena
 		}
 
-		var povprecje float64 = float64(vsota) / float64(len(s.ocene))
+		var povprecje float64 = float64(vsota) / float64(len(s.Ocene))
 
 		if povprecje < 6 {
 			return 0.0
@@ -51,21 +65,25 @@ func povprecje(redovalnica map[string]Student, vpisnaStevilka string)float64{
 	}
 }
 
-func izpisiKoncniUspeh(studenti map[string]Student){
-	for vpisna,s := range studenti {
-		var povp float64 = povprecje(studenti, vpisna)
+//IzpisiKoncniUspeh je funkcija, ki izpiše končni uspeh vseh študentov v redovalnici
+func IzpisiKoncniUspeh(stOcen int){
+	for vpisna,s := range Redovalnica {
+		if len(s.Ocene) < stOcen{
+			fmt.Printf(" -> Negativno ocenjen (premalo ocen)\n")
+		}
+		var povp float64 = povprecje(vpisna)
 		if povp == 0{
-			if len(s.ocene) == 0{
+			if len(s.Ocene) == 0{
 				continue
 			}
 			var vsota float64 = 0
-			for _,ocena := range s.ocene{
+			for _,ocena := range s.Ocene{
 				vsota += float64(ocena)
 			}
-			povp = vsota / float64(len(s.ocene))
+			povp = vsota / float64(len(s.Ocene))
 		}
 
-		fmt.Printf("%s %s: povprena ocena %.1f", s.ime, s.priimek, povp)
+		fmt.Printf("%s %s: povprena ocena %.1f", s.Ime, s.Priimek, povp)
 		if povp >= 9{
 			fmt.Printf(" -> Odlicen student!\n")
 		}else if povp >= 6 && povp < 9{
